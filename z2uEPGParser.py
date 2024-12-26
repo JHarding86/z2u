@@ -10,7 +10,6 @@ output_file = 'filtered_epg_data.xml'
 
 def downloadEPG(username, password):
     url = f"http://line.empire-4k.cc/xmltv.php?username={username}&password={password}"
-    local_filename = "epg_data.xml"
 
     # Send a GET request to the URL
     response = requests.get(url)
