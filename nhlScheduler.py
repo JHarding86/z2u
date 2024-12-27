@@ -166,7 +166,7 @@ def outputM3ULine(teamName, otherTeam, link, logo, dateString, isThereAGame = 1)
     end_first_fill = utc_game_S_programme - datetime.timedelta(seconds=1)
 
     start_second_fill = utc_game_E_programme + datetime.timedelta(seconds=1)
-    end_second_fill = time.min
+    end_second_fill = datetime.datetime.combine(start_second_fill, time.max)
     mst_game_S_display = utc_game_S_programme - datetime.timedelta(hours=7)
 
     # print(f"First Fill:  {start_first_fill} {end_first_fill}")
@@ -174,14 +174,14 @@ def outputM3ULine(teamName, otherTeam, link, logo, dateString, isThereAGame = 1)
     # print(f"Second Fill: {start_second_fill} {end_second_fill}")
     # print(f"Game Display Time: {mst_game_S_display}")
 
-    channelName = f"{teamName} vs {otherTeam} - {mst_game_S_display}"
+    channelName = f"{teamName} vs {otherTeam} - {mst_game_S_display.strftime('%m/%d/%Y %I:%M %p')}"
 
     if isThereAGame:
         programme = createSingleEPGData(start_first_fill.strftime('%Y%m%d%H%M%S'), end_first_fill.strftime('%Y%m%d%H%M%S'), UniqueID, channelName, "Fill Block for the day.")
         root.append(programme)
         programme = createSingleEPGData(utc_game_S_programme.strftime('%Y%m%d%H%M%S'), utc_game_E_programme.strftime('%Y%m%d%H%M%S'), UniqueID, channelName, "This is the game!")
         root.append(programme)
-        programme = createSingleEPGData(start_second_fill.strftime('%Y%m%d%H%M%S'), end_second_fill.strftime('%Y%m%d%H%M%S'), UniqueID, channelName, "Fill Block for the day.")
+        programme = createSingleEPGData(start_second_fill.strftime('%Y%m%d%H%M%S'), end_second_fill.strftime('%Y%m%d%H%M%S'), UniqueID, channelName, "This game has ended.")
         root.append(programme)
     else:
         programme = createSingleEPGData(start_first_fill.strftime('%Y%m%d%H%M%S'), end_second_fill.strftime('%Y%m%d%H%M%S'), UniqueID, "No Game", "There is no game on this channel for this day.")
