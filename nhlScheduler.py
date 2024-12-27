@@ -1,5 +1,6 @@
 import requests
 import datetime
+from datetime import time
 import json
 import argparse
 import random
@@ -142,28 +143,49 @@ def outputM3ULine(teamName, otherTeam, link, logo, dateString, isThereAGame = 1)
     xmlChannel = createSingleChannelEPGData(UniqueID, tvgName, logo)
     root.append(xmlChannel)
 
-    start_date = datetime.datetime.strptime(dateString, '%Y-%m-%dT%H:%M:%SZ')
+    #NHL schedule has times in UTC. Plex does a good job of converting these times for presentation in your time zone.
+    #There is a problem when an entire channel is dedicated to a single show. That is at the begining of the day, you would
+    #like the channel to show the date and time at the begining of the day so you know when it comes on. If you use UTC time for that,
+    #you wont see the program data at the point in time you would like.
 
-    global mStartTime
-    mStartTime = start_date.strftime("%Y%m%d000000")
-    stop_date = start_date + datetime.timedelta(days=2)
-    global mStopTime
-    mStopTime = stop_date.strftime("%Y%m%d000000")
+    #To account for this, you must adjust the UTC time to your timezone (here it is adjusting for MST -7hrs):
+        #Items Needed:
+            #A start time for the day in UTC. - Midnight of that day in UTC, Used as fake filler data
+            #An end time for the fake filler data
+            #A start time for the actual game
+            #An end time for the actual game.
+            #Start and end time for filler data for the rest of the day
 
+    utc_game_S_programme = datetime.datetime.strptime(dateString, '%Y-%m-%dT%H:%M:%SZ')
+    utc_game_E_programme = utc_game_S_programme + datetime.timedelta(hours=2.5)
 
-    format_12_hour = start_date.strftime("%m/%d/%y")
-    start_date = start_date - datetime.timedelta(hours=7)
+    mst_current_date = datetime.datetime.now().date()
+    mst_start_of_day = datetime.datetime.combine(mst_current_date, time.min)
 
-    startHour = start_date.strftime("%I:%M %p") + " (MST)"
-    format_12_hour = format_12_hour + " - " + startHour
+    start_first_fill = mst_start_of_day + datetime.timedelta(hours=7)
+    end_first_fill = utc_game_S_programme - datetime.timedelta(seconds=1)
 
-    channelName = teamName + " vs " + otherTeam + " " + format_12_hour
+    start_second_fill = utc_game_E_programme + datetime.timedelta(seconds=1)
+    end_second_fill = time.min
+    mst_game_S_display = utc_game_S_programme - datetime.timedelta(hours=7)
+
+    # print(f"First Fill:  {start_first_fill} {end_first_fill}")
+    # print(f"Game Fill:   {utc_game_S_programme} {utc_game_E_programme}")
+    # print(f"Second Fill: {start_second_fill} {end_second_fill}")
+    # print(f"Game Display Time: {mst_game_S_display}")
+
+    channelName = f"{teamName} vs {otherTeam} - {mst_game_S_display}"
 
     if isThereAGame:
-        programme = createSingleEPGData(mStartTime, mStopTime, UniqueID, channelName, "No Description.")
+        programme = createSingleEPGData(start_first_fill.strftime('%Y%m%d%H%M%S'), end_first_fill.strftime('%Y%m%d%H%M%S'), UniqueID, channelName, "Fill Block for the day.")
+        root.append(programme)
+        programme = createSingleEPGData(utc_game_S_programme.strftime('%Y%m%d%H%M%S'), utc_game_E_programme.strftime('%Y%m%d%H%M%S'), UniqueID, channelName, "This is the game!")
+        root.append(programme)
+        programme = createSingleEPGData(start_second_fill.strftime('%Y%m%d%H%M%S'), end_second_fill.strftime('%Y%m%d%H%M%S'), UniqueID, channelName, "Fill Block for the day.")
+        root.append(programme)
     else:
-        programme = createSingleEPGData(mStartTime, mStopTime, UniqueID, "No Game", "There is no game on this channel for this day.")
-    root.append(programme)
+        programme = createSingleEPGData(start_first_fill.strftime('%Y%m%d%H%M%S'), end_second_fill.strftime('%Y%m%d%H%M%S'), UniqueID, "No Game", "There is no game on this channel for this day.")
+        root.append(programme)
 
 def createEPG(dateIndex):
     games = data["gameWeek"][dateIndex]["games"]
@@ -213,7 +235,7 @@ def main():
         os.remove(custom_m3u)
         
     print("Download M3U File...")
-    downloadM3UFile(args.username, args.password)
+    # downloadM3UFile(args.username, args.password)
 
     print("Narrowing down the channels to NHL channels...")
     narrowDownChannels()
