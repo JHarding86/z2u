@@ -20,8 +20,8 @@ root = ET.Element('tv')
 
 def getNHLSchedule(file_name):
     # Get the current date
-    # current_date = datetime.datetime.now().strftime('%Y-%m-%d')
-    current_date = "2024-12-27"
+    current_date = datetime.datetime.now().strftime('%Y-%m-%d')
+    # current_date = "2024-12-27"
     url = f"https://api-web.nhle.com/v1/schedule/{current_date}"
 
     # Send a GET request to the URL
@@ -170,11 +170,11 @@ def outputM3ULine(teamName, otherTeam, link, logo, dateString, isThereAGame = 1)
     end_second_fill = game_end_of_day
     mst_game_S_display = utc_game_S_programme - datetime.timedelta(hours=7)
 
-    print(f"Game Time: {utc_game_S_programme} {utc_game_E_programme}")
-    print(f"First Fill:  {start_first_fill} {end_first_fill}")
-    print(f"Game Fill:   {utc_game_S_programme} {utc_game_E_programme}")
-    print(f"Second Fill: {start_second_fill} {end_second_fill}")
-    print(f"Game Display Time: {mst_game_S_display}")
+    # print(f"Game Time: {utc_game_S_programme} {utc_game_E_programme}")
+    # print(f"First Fill:  {start_first_fill} {end_first_fill}")
+    # print(f"Game Fill:   {utc_game_S_programme} {utc_game_E_programme}")
+    # print(f"Second Fill: {start_second_fill} {end_second_fill}")
+    # print(f"Game Display Time: {mst_game_S_display}")
 
     channelName = f"{teamName} vs {otherTeam} - {mst_game_S_display.strftime('%m/%d/%Y %I:%M %p')}"
 
