@@ -235,7 +235,7 @@ def main():
         os.remove(custom_m3u)
         
     print("Download M3U File...")
-    # downloadM3UFile(args.username, args.password)
+    downloadM3UFile(args.username, args.password)
 
     print("Narrowing down the channels to NHL channels...")
     narrowDownChannels()
