@@ -159,16 +159,16 @@ def outputM3ULine(teamName, otherTeam, link, logo, dateString, isThereAGame = 1)
     utc_game_S_programme = datetime.datetime.strptime(dateString, '%Y-%m-%dT%H:%M:%SZ')
     utc_game_E_programme = utc_game_S_programme + datetime.timedelta(hours=2.5)
 
-    mst_current_date = datetime.datetime.now().date()
-    mst_start_of_day = datetime.datetime.combine(mst_current_date, time.min)
+    game_end_of_day = datetime.datetime.combine(utc_game_E_programme, time.max)
 
-    start_first_fill = mst_start_of_day + datetime.timedelta(hours=7)
     end_first_fill = utc_game_S_programme - datetime.timedelta(seconds=1)
+    start_first_fill = datetime.datetime.combine(end_first_fill, time.min)#mst_start_of_day + datetime.timedelta(hours=7)
 
     start_second_fill = utc_game_E_programme + datetime.timedelta(seconds=1)
-    end_second_fill = datetime.datetime.combine(start_second_fill, time.max)
+    end_second_fill = game_end_of_day
     mst_game_S_display = utc_game_S_programme - datetime.timedelta(hours=7)
 
+    # print(f"Game Time: {utc_game_S_programme} {utc_game_E_programme}")
     # print(f"First Fill:  {start_first_fill} {end_first_fill}")
     # print(f"Game Fill:   {utc_game_S_programme} {utc_game_E_programme}")
     # print(f"Second Fill: {start_second_fill} {end_second_fill}")
