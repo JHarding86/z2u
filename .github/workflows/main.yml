@@ -41,7 +41,6 @@ jobs:
         git add filtered_epg_data.xml
         git add customNHL.epg
         git add customNHL.m3u
-        git commit -m ''
         git commit -m 'Updated generic EPG data and Updated NHL EPG/M3U data'
         git push
       env:
