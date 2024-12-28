@@ -1,6 +1,6 @@
 from lxml import etree
-import requests
 import argparse
+from epgTools import epgTools
 
 keywords = ["ABC KMGH DENVER","CBS 4 DENVER","NBC 9 DENVER CO","Sportsnet", "Max Sport", "Balley Sports", " Sky Sport", "HBO ", "Disney", "Discovery", "Cinemax", "Altitude Sports", "NHL", "NFL", "NBA", "ESPN", "Nickelodeon", "Showtime", "Starz", "SYFY", "USA Network", "TNT", "Animal Planet", "FOX HD", "FOX SPORTS","FOX SOCCER", "BBC", "NATIONAL GEOGRAPHIC", "CRIME & INVESTIGATION", "DIY NETWORK", "AMERICAN HORRORS", "DESTINATION AMERICA","HISTORY HD","SPIKE/PARAMOUNT", "PARAMOUNT NETWORK HD","History","Wild Earth","HALLMARK CHANNEL", "HALLMARK DRAMA","HALLMARK MOVIES & MYSTERIES","SCREENPIX","AMC","FX HD","FXX HD","SONY MOVIE","MGM+","MOVIE PLEX","CINE LIFE","LIFETIME MOVIE NETWORK","LIFETIME HD","COMEDY CENTRAL HD","SMITHSONIAN","NASA","TRU TV","HGTV","TBC","TLC","ADULT SWIM","COMEDY TV","A&E","BRAVO","ION TV","CARTOON NETWORK","PBS CA LOS ANGELES","MTV","MC MUSIC","GAME SHOW NETWORK","UFC","Red Bull","NBC SPORTS","PAC-12","Motortrend HD", "Motortrend FHD", "Motortrend SD","Fubo Sports","Root Sports","FORENSIC FILES"]  # Replace with your actual keywords
 input_file = 'downloaded_file.m3u'
@@ -9,18 +9,6 @@ epg_file = 'filtered_epg_data.xml'
 
 # Convert keywords to lowercase
 keywords = [keyword.lower() for keyword in keywords]
-
-def downloadM3UFile(user, password):
-    url = f"https://line.empire-4k.cc/get.php?username={user}&password={password}&type=m3u&output=mpegts"
-
-    # Send a GET request to the URL
-    response = requests.get(url)
-
-    # Save the content to a local file
-    with open(input_file, 'wb') as file:
-        file.write(response.content)
-
-    print(f"File downloaded and saved as {input_file}")
 
 def narrowDownChannels():
     with open(input_file, 'r', encoding='utf-8', errors='ignore') as infile, open(output_file, 'w', encoding='utf-8') as outfile:
@@ -85,7 +73,7 @@ def main():
     args = parser.parse_args()
 
     print("Downloading Z2U M3U File...")
-    # downloadM3UFile(args.username, args.password)
+    epgTools.downloadM3UFile(args.username, args.password, input_file)
 
     print("Narrowing down the channels list...")
     narrowDownChannels()

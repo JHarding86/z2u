@@ -7,11 +7,15 @@ import random
 import uuid
 import os
 import xml.etree.ElementTree as ET
+from epgTools import epgTools
 
 input_file = "downloaded_file.m3u"
 allNHL_m3u = "nhlall.m3u"
 custom_m3u = "customNHL.m3u"
 custom_epg = "customNHL.epg"
+
+cleaned_file = 'cleaned_epg_data.xml'
+output_file = 'nhl_epg_data.xml'
 
 data = json
 unique_ids = []
@@ -43,30 +47,19 @@ def parseNHLScheduleToJSON(file_name):
     print("JSON data has been parsed:")
     # print(json.dumps(data, indent=4))
 
-def downloadM3UFile(user, password):
-    url = f"https://line.empire-4k.cc/get.php?username={user}&password={password}&type=m3u&output=mpegts"
-
-    # Send a GET request to the URL
-    response = requests.get(url)
-
-    # Save the content to a local file
-    with open(input_file, 'wb') as file:
-        file.write(response.content)
-
-    print(f"File downloaded and saved as {input_file}")
-
-def narrowDownChannels():
-    with open(input_file, 'r', encoding='utf-8', errors='ignore') as infile, open(allNHL_m3u, 'w', encoding='utf-8') as outfile:
+def narrowDownM3UChannelsByKeywords(includeKeywords, excludeKeywords, m3uInputFile, m3uOutputFile):
+    with open(m3uInputFile, 'r', encoding='utf-8', errors='ignore') as infile, open(m3uOutputFile, 'w', encoding='utf-8') as outfile:
         lines = infile.readlines()
         i = 1
         while i < len(lines):
             line = lines[i].lower()
             # Check to make sure these item do not exist in the string
             # Check for "#EXTINF:-1,US" and keywords, Special exemption for adding a colorado avalanche specific channel
-            if "#extinf:-1,nhl" in line and " : " in line:
-                outfile.write(lines[i])  # Write the original line
-                if i + 1 < len(lines):
-                    outfile.write(lines[i + 1])
+            if any(word.lower() in line for word in includeKeywords):
+                if all(word.lower() not in line for word in excludeKeywords):
+                    outfile.write(lines[i])  # Write the original line
+                    if i + 1 < len(lines):
+                        outfile.write(lines[i + 1])
             i += 2
 
     print("Processing complete. Check the output file for results.")
@@ -145,8 +138,8 @@ def outputM3ULine(teamName, otherTeam, link, logo, dateString, isThereAGame = 1)
 
     #NHL schedule has times in UTC. Plex does a good job of converting these times for presentation in your time zone.
     #There is a problem when an entire channel is dedicated to a single show. That is at the begining of the day, you would
-    #like the channel to show the date and time at the begining of the day so you know when it comes on. If you use UTC time for that,
-    #you wont see the program data at the point in time you would like.
+    #like the channel to show the date and time so you know when it comes on. UTC time must be used for this, so some trickery
+    #must be used to come up with the correct start of day time.
 
     #To account for this, you must adjust the UTC time to your timezone (here it is adjusting for MST -7hrs):
         #Items Needed:
@@ -213,17 +206,15 @@ def createEPG(dateIndex):
             if awayTeamName.lower() in channel["extinf"].lower():
                 # print(f"We found match for away team {awayTeamName} - {line}")
                 outputM3ULine(awayTeamName, homeTeamName, channel["url"], awayTeamLogo, dateString)
-            if homeTeamName.lower() in channel["extinf"].lower():
-                # print(f"We found match for home team {homeTeamName} - {line}")
-                outputM3ULine(homeTeamName, awayTeamName, channel["url"], homeTeamLogo, dateString)
+            # if homeTeamName.lower() in channel["extinf"].lower():
+            #     # print(f"We found match for home team {homeTeamName} - {line}")
+            #     outputM3ULine(homeTeamName, awayTeamName, channel["url"], homeTeamLogo, dateString)
             i += 1
 
     #Make sure there are always at 35 channels made
     if channelCount < 35:
         for i in range(0, 35 - channelCount):
             outputM3ULine("", "", "http://line.empire-4k.cc:80/A32382/182D35/745248", "https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg", dateString, 0)
-
-        
 
 def main():
     print("Generating Custom M3U File...")
@@ -236,11 +227,12 @@ def main():
     if os.path.isfile(custom_m3u):
         os.remove(custom_m3u)
         
-    print("Download M3U File...")
-    downloadM3UFile(args.username, args.password)
+    print("Downloading M3U File...")
+    epgTools.downloadM3UFile(args.username, args.password, input_file)
 
-    print("Narrowing down the channels to NHL channels...")
-    narrowDownChannels()
+    narrowDownM3UChannelsByKeywords(["NHL"], ["Network", " : ", "REPLAY"], input_file, allNHL_m3u)
+
+    epgTools.filter_channels(cleaned_file, output_file, "NHL", False)
 
     print("Getting NHL Scheulde...")
     getNHLSchedule("nhlSchedule.json")
@@ -252,7 +244,6 @@ def main():
     generate_unique_ids(80)
 
     createEPG(0)
-    # createEPG(1)
 
     tree = ET.ElementTree(root)
     tree.write(custom_epg, encoding='utf-8', xml_declaration=True)

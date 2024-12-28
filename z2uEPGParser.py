@@ -3,13 +3,15 @@ import re
 from lxml import etree
 import sys
 import argparse
+from epgTools import epgTools
 
-input_file = 'epg_data.xml'
+input_file = 'epg_data-King.xml'
 cleaned_file = 'cleaned_epg_data.xml'
 output_file = 'filtered_epg_data.xml'
 
 def downloadEPG(username, password):
-    url = f"http://line.empire-4k.cc/xmltv.php?username={username}&password={password}"
+    url = f"http://line.king-4k.cc/xmltv.php?username={username}&password={password}"
+    # url = f"http://line.empire-4k.cc/xmltv.php?username={username}&password={password}"
 
     # Send a GET request to the URL
     response = requests.get(url)
@@ -45,39 +47,6 @@ def validate_cleaned_xml(file_path):
         print(f"An error occurred: {e}")
         sys.exit(1)
 
-def filter_us_channels(input_file, output_file):
-    try:
-        with open(input_file, 'rb') as file:
-            content = file.read()
-            tree = etree.fromstring(content)
-
-            # Find all channel elements
-            channels = tree.findall('.//channel')
-            # Find all programme elements
-            programmes = tree.findall('.//programme')
-
-            # Filter channels with "US ▎" in display-name and non-blank ID
-            us_channel_ids = {channel.get('id') for channel in channels if channel.get('id') and "US ▎" in channel.find('display-name').text}
-
-            # Remove channels not in the US list
-            for channel in channels:
-                if channel.get('id') not in us_channel_ids:
-                    channel.getparent().remove(channel)
-
-            # Remove programmes not linked to US channels
-            for programme in programmes:
-                if programme.get('channel') not in us_channel_ids:
-                    programme.getparent().remove(programme)
-
-            # Write the filtered XML to a new file
-            with open(output_file, 'wb') as output:
-                output.write(etree.tostring(tree, pretty_print=True, encoding='utf-8'))
-
-            print(f"Filtered channels saved to '{output_file}'.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        sys.exit(1)
-
 def main():
     parser = argparse.ArgumentParser(description='Process EPG data.')
     parser.add_argument('username', type=str, help='Username for the Z2U service')
@@ -95,7 +64,7 @@ def main():
     validate_cleaned_xml(cleaned_file)
 
     #Filter down to just US EPG Data
-    filter_us_channels(cleaned_file, output_file)
+    epgTools.filter_channels(cleaned_file, output_file, "US ▎", True)
 
 if __name__ == "__main__":
     main()
