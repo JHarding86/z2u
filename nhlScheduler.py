@@ -205,7 +205,7 @@ def createEPG(dateIndex):
             channel = nhlChannels[i]
             if awayTeamName.lower() in channel["extinf"].lower():
                 # print(f"We found match for away team {awayTeamName} - {line}")
-                outputM3ULine(awayTeamName, homeTeamName, channel["url"], "https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg", dateString)
+                outputM3ULine(awayTeamName, homeTeamName, channel["url"], awayTeamLogo, dateString)
             # if homeTeamName.lower() in channel["extinf"].lower():
             #     # print(f"We found match for home team {homeTeamName} - {line}")
             #     outputM3ULine(homeTeamName, awayTeamName, channel["url"], homeTeamLogo, dateString)
