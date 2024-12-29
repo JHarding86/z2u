@@ -171,14 +171,16 @@ def outputM3ULine(teamName, otherTeam, link, logo, dateString, isThereAGame = 1)
     # print(f"Second Fill: {start_second_fill} {end_second_fill}")
     # print(f"Game Display Time: {mst_game_S_display}")
 
-    channelName = f"{teamName} vs {otherTeam} - {mst_game_S_display.strftime('%m/%d/%Y %I:%M %p')}"
+    channelNamePre  = f"Pre-Game {teamName} vs {otherTeam} - {mst_game_S_display.strftime('%m/%d/%Y %I:%M %p')}"
+    channelName     = f"{teamName} vs {otherTeam} - {mst_game_S_display.strftime('%m/%d/%Y %I:%M %p')}"
+    channelNamePost = f"Post-Game {teamName} vs {otherTeam} - {mst_game_S_display.strftime('%m/%d/%Y %I:%M %p')}"
 
     if isThereAGame:
-        programme = createSingleEPGData(start_first_fill.strftime('%Y%m%d%H%M%S'), end_first_fill.strftime('%Y%m%d%H%M%S'), UniqueID, channelName, "Fill Block for the day.")
+        programme = createSingleEPGData(start_first_fill.strftime('%Y%m%d%H%M%S'), end_first_fill.strftime('%Y%m%d%H%M%S'), UniqueID, channelNamePre, "Fill Block for the day.")
         root.append(programme)
         programme = createSingleEPGData(utc_game_S_programme.strftime('%Y%m%d%H%M%S'), utc_game_E_programme.strftime('%Y%m%d%H%M%S'), UniqueID, channelName, "This is the game!")
         root.append(programme)
-        programme = createSingleEPGData(start_second_fill.strftime('%Y%m%d%H%M%S'), end_second_fill.strftime('%Y%m%d%H%M%S'), UniqueID, channelName, "This game has ended.")
+        programme = createSingleEPGData(start_second_fill.strftime('%Y%m%d%H%M%S'), end_second_fill.strftime('%Y%m%d%H%M%S'), UniqueID, channelNamePost, "This game has ended.")
         root.append(programme)
     else:
         programme = createSingleEPGData(start_first_fill.strftime('%Y%m%d%H%M%S'), end_second_fill.strftime('%Y%m%d%H%M%S'), UniqueID, "No Game", "There is no game on this channel for this day.")
@@ -208,15 +210,17 @@ def createEPG(dateIndex):
             if awayTeamName.lower() in channel["extinf"].lower():
                 # print(f"We found match for away team {awayTeamName} - {line}")
                 outputM3ULine(awayTeamName, homeTeamName, channel["url"], awayTeamLogo, dateString)
+                nhlChannels.pop(i)
+                break
             # if homeTeamName.lower() in channel["extinf"].lower():
             #     # print(f"We found match for home team {homeTeamName} - {line}")
             #     outputM3ULine(homeTeamName, awayTeamName, channel["url"], homeTeamLogo, dateString)
             i += 1
 
     #Make sure there are always at 35 channels made
-    if channelCount < 35:
-        for i in range(0, 35 - channelCount):
-            outputM3ULine("", "", "http://line.empire-4k.cc:80/A32382/182D35/745248", "https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg", dateString, 0)
+    while len(nhlChannels) > 0:
+        outputM3ULine("", "", nhlChannels[0]["url"], "https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg", dateString, 0)
+        nhlChannels.pop(0)
 
 def main():
     print("Generating Custom M3U File...")
