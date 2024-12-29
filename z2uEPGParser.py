@@ -4,9 +4,10 @@ from lxml import etree
 import sys
 import argparse
 from epgTools import epgTools
+import os
 
-input_file = 'epg_data-King.xml'
-cleaned_file = 'cleaned_epg_data.xml'
+input_file = 'temp/epg_data-King.xml'
+cleaned_file = 'temp/cleaned_epg_data.xml'
 output_file = 'filtered_epg_data.xml'
 
 def downloadEPG(username, password):
@@ -53,6 +54,16 @@ def main():
     parser.add_argument('password', type=str, help='Password for the Z2U service')
 
     args = parser.parse_args()
+
+    # Create a directory named "temp"
+    directory_name = "temp"
+
+    # Check if the directory already exists
+    if not os.path.exists(directory_name):
+        os.makedirs(directory_name)
+        print(f"Directory '{directory_name}' created successfully.")
+    else:
+        print(f"Directory '{directory_name}' already exists.")
 
     #Download the EPG Source
     downloadEPG(args.username, args.password)

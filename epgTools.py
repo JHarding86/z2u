@@ -33,7 +33,7 @@ class epgTools:
                             add = True
                     else:
                         if keyword in dname:
-                            print(dname)
+                            print(dname + " " + channelID)
                             add = True
                     
                     if add == True:
@@ -64,10 +64,19 @@ class epgTools:
         url = f"https://line.empire-4k.cc/get.php?username={user}&password={password}&type=m3u&output=mpegts"
 
         # Send a GET request to the URL
-        response = requests.get(url)
+        response = requests.get(url, stream=True)
 
+        # Get the total size of the response (in bytes)
+        total_size = int(response.headers.get('content-length', 0))
+        downloaded = 0
         # Save the content to a local file
         with open(outputFile, 'wb') as file:
-            file.write(response.content)
+            # Iterate over the response content in chunks
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    file.write(chunk)
+                    downloaded += len(chunk)
+                    percent = downloaded/total_size *100
+                    print(f"Progress: {percent:.2f}%")
 
         print(f"File downloaded and saved as {outputFile}")

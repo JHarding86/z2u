@@ -8,14 +8,15 @@ import uuid
 import os
 import xml.etree.ElementTree as ET
 from epgTools import epgTools
+from lxml import etree
 
-input_file = "downloaded_file.m3u"
-allNHL_m3u = "nhlall.m3u"
+input_file = "temp/downloaded_file.m3u"
+allNHL_m3u = "temp/nhlall.m3u"
 custom_m3u = "customNHL.m3u"
-custom_epg = "customNHL.epg"
+custom_epg = "customNHL.xml"
 
-cleaned_file = 'cleaned_epg_data.xml'
-output_file = 'nhl_epg_data.xml'
+cleaned_file = 'temp/cleaned_epg_data.xml'
+output_file = 'temp/nhl_epg_data.xml'
 
 data = json
 unique_ids = []
@@ -152,7 +153,8 @@ def outputM3ULine(teamName, otherTeam, link, logo, dateString, isThereAGame = 1)
     utc_game_S_programme = datetime.datetime.strptime(dateString, '%Y-%m-%dT%H:%M:%SZ')
     utc_game_E_programme = utc_game_S_programme + datetime.timedelta(hours=2.5)
 
-    game_end_of_day = datetime.datetime.combine(utc_game_E_programme, time.max)
+    mst_game_E_programme = utc_game_E_programme - datetime.timedelta(hours=7)
+    game_end_of_day = datetime.datetime.combine(mst_game_E_programme, time.max) + datetime.timedelta(hours=7)
 
     game_mst = utc_game_S_programme - datetime.timedelta(hours=7)
     game_mst_day_start = datetime.datetime.combine(game_mst, time.min)
@@ -235,10 +237,10 @@ def main():
     epgTools.filter_channels(cleaned_file, output_file, "NHL", False)
 
     print("Getting NHL Scheulde...")
-    getNHLSchedule("nhlSchedule.json")
+    getNHLSchedule("temp/nhlSchedule.json")
 
     print("Parsing NHL Scheulde...")
-    parseNHLScheduleToJSON("nhlSchedule.json")
+    parseNHLScheduleToJSON("temp/nhlSchedule.json")
 
     # Generate unique IDs so that we always have the same place to put different channels
     generate_unique_ids(80)
@@ -246,7 +248,10 @@ def main():
     createEPG(0)
 
     tree = ET.ElementTree(root)
-    tree.write(custom_epg, encoding='utf-8', xml_declaration=True)
+    with open(custom_epg, 'wb') as afile:
+        xmlString = etree.fromstring(ET.tostring(root, encoding='utf-8').decode('utf-8'))
+        afile.write(etree.tostring(xmlString, pretty_print=True, encoding='utf-8'))
+    # tree.write(custom_epg, encoding='utf-8', xml_declaration=True)
 
 if __name__ == "__main__":
     main()
