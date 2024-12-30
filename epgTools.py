@@ -80,7 +80,7 @@ class epgTools:
                     file.write(chunk)
                     downloaded += len(chunk)
                     percent = downloaded/total_size *100
-                    print(f"Progress: {percent:.2f}%")
+                    print(f"\rProgress: {percent:.2f}%", end='', flush=True)
 
         print(f"File downloaded and saved as {outputFile}")
     

@@ -81,6 +81,7 @@ def createSingleEPGData(startTime, stopTime, UniqueID, channelName, description)
     programme   = ET.Element('programme')
     title       = ET.Element('title')
     desc        = ET.Element('desc')
+    category    = ET.Element('category')
 
     programme.set('start', startTime + " +0000")
     programme.set('stop', stopTime + " +0000")
@@ -90,8 +91,12 @@ def createSingleEPGData(startTime, stopTime, UniqueID, channelName, description)
 
     desc.text = description
 
+    category.set('lang', "en")
+    category.text = "Sports"
+
     programme.append(title)
     programme.append(desc)
+    programme.append(category)
 
     return programme
 
