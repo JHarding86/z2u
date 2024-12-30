@@ -210,7 +210,7 @@ def main():
 
     epgTools.filterM3UByKeywords(["NHL"], ["Network", " : ", "REPLAY"], input_file, allNHL_m3u)
 
-    epgTools.filterEPGByKeywords(cleaned_file, output_file, "NHL", False)
+    # epgTools.filterEPGByKeywords(cleaned_file, output_file, "NHL", False)
 
     print("Getting NHL Scheulde...")
     getNHLSchedule("temp/nhlSchedule.json")
@@ -219,6 +219,7 @@ def main():
     parseNHLScheduleToJSON("temp/nhlSchedule.json")
 
     # Generate unique IDs so that we always have the same place to put different channels
+    global unique_ids
     unique_ids = epgTools.generate_unique_ids(80, 42)
 
     createEPG(0)
