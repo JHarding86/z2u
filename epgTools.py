@@ -1,10 +1,13 @@
 import sys
 from lxml import etree
 import requests
+import random
+import uuid
+import os
 
 class epgTools:
     @staticmethod
-    def filter_channels(input_file, output_file, keyword, needsChannelID):
+    def filterEPGByKeywords(input_file, output_file, keyword, needsChannelID):
         try:
             with open(input_file, 'rb') as file:
                 content = file.read()
@@ -80,3 +83,40 @@ class epgTools:
                     print(f"Progress: {percent:.2f}%")
 
         print(f"File downloaded and saved as {outputFile}")
+    
+    @staticmethod
+    def filterM3UByKeywords(includeKeywords, excludeKeywords, m3uInputFile, m3uOutputFile):
+        with open(m3uInputFile, 'r', encoding='utf-8', errors='ignore') as infile, open(m3uOutputFile, 'w', encoding='utf-8') as outfile:
+            lines = infile.readlines()
+            i = 1
+            while i < len(lines):
+                line = lines[i].lower()
+                # Check to make sure these item do not exist in the string
+                # Check for "#EXTINF:-1,US" and keywords, Special exemption for adding a colorado avalanche specific channel
+                if any(word.lower() in line for word in includeKeywords):
+                    if all(word.lower() not in line for word in excludeKeywords):
+                        outfile.write(lines[i])  # Write the original line
+                        if i + 1 < len(lines):
+                            outfile.write(lines[i + 1])
+                i += 2
+
+        print("Processing complete. Check the output file for results.")
+    
+    @staticmethod
+    def generate_unique_ids(count, seed):
+        random.seed(seed)
+        ids = []
+        for _ in range(count):
+            id_str = str(uuid.UUID(int=random.getrandbits(128)))  # Generate a unique UUID
+            ids.append(id_str)
+        global unique_ids
+        return ids
+    
+    @staticmethod
+    def createDirectory(dir):
+        # Check if the directory already exists
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+            print(f"Directory '{dir}' created successfully.")
+        else:
+            print(f"Directory '{dir}' already exists.")

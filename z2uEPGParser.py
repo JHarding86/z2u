@@ -4,7 +4,6 @@ from lxml import etree
 import sys
 import argparse
 from epgTools import epgTools
-import os
 
 input_file = 'temp/epg_data-King.xml'
 cleaned_file = 'temp/cleaned_epg_data.xml'
@@ -55,15 +54,7 @@ def main():
 
     args = parser.parse_args()
 
-    # Create a directory named "temp"
-    directory_name = "temp"
-
-    # Check if the directory already exists
-    if not os.path.exists(directory_name):
-        os.makedirs(directory_name)
-        print(f"Directory '{directory_name}' created successfully.")
-    else:
-        print(f"Directory '{directory_name}' already exists.")
+    epgTools.createDirectory("temp")
 
     #Download the EPG Source
     downloadEPG(args.username, args.password)
