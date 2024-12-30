@@ -66,7 +66,7 @@ def main():
     validate_cleaned_xml(cleaned_file)
 
     #Filter down to just US EPG Data
-    epgTools.filter_channels(cleaned_file, output_file, "US ▎", True)
+    epgTools.filterEPGByKeywords(cleaned_file, output_file, "US ▎", True)
 
 if __name__ == "__main__":
     main()
