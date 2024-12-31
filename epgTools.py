@@ -85,9 +85,10 @@ class epgTools:
                     file.write(chunk)
                     downloaded += len(chunk)
                     percent = downloaded/total_size *100
-                    print(f"\rProgress: {percent:.2f}%", end='', flush=True)
+                    sys.stdout.write(f"\rProgress: {percent:.2f}%")
+                    sys.stdout.flush()
 
-        print(f"File downloaded and saved as {outputFile}")
+        print(f"\nFile downloaded and saved as {outputFile}")
     
     @staticmethod
     def filterM3UByKeywords(includeKeywords, excludeKeywords, m3uInputFile, m3uOutputFile):
@@ -194,11 +195,11 @@ class epgTools:
         return programme
 
     @staticmethod
-    def outputM3ULine(root: ET.Element, teamName, otherTeam, link, logo, dateString, UniqueID, isThereAGame, channelName, m3uFile):
+    def outputM3ULine(root: ET.Element, teamName, otherTeam, link, logo, dateString, UniqueID, isThereAGame, channelName, m3uFile, filePrefix):
         tvgName = channelName
         tvLabel = tvgName
         with open(m3uFile, 'a', encoding='utf-8') as file:  # Use 'a' mode for appending
-            file.write(f'#EXTINF:-1 tvg-id="{UniqueID}" tvg-name="{tvgName}" tvg-logo="{logo}" group-title="James Custom", {tvLabel}\n')
+            file.write(f'#EXTINF:-1 tvg-id="{UniqueID}" tvg-name="{tvgName}" tvg-logo="{logo}" group-title="{filePrefix} Custom", {tvLabel}\n')
             file.write(link + "\n")
 
         #Creating EPG Data
@@ -285,7 +286,7 @@ class epgTools:
                 channel = channels[i]
                 if awayTeamName.lower() in channel["extinf"].lower():
                     # print(f"We found match for away team {awayTeamName} - {line}")
-                    epgTools.outputM3ULine(root, awayTeamName, homeTeamName, channel["url"], logo, dateString, uniqueIDs.pop(0), True, epgTools.getChannelName(filePrefix), m3uFile)
+                    epgTools.outputM3ULine(root, awayTeamName, homeTeamName, channel["url"], logo, dateString, uniqueIDs.pop(0), True, epgTools.getChannelName(filePrefix), m3uFile, filePrefix)
                     channels.pop(i)
                     break
                 # if homeTeamName.lower() in channel["extinf"].lower():
@@ -293,9 +294,9 @@ class epgTools:
                 #     outputM3ULine(homeTeamName, awayTeamName, channel["url"], homeTeamLogo, dateString)
                 i += 1
 
-        #Make sure there are always at 35 channels made
+        #Make sure to consume all of the channel slots
         while len(channels) > 0:
-            epgTools.outputM3ULine(root, "", "", channels[0]["url"], "https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg", dateString, uniqueIDs.pop(0), False, epgTools.getChannelName(filePrefix), m3uFile)
+            epgTools.outputM3ULine(root, "", "", channels[0]["url"], "https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg", dateString, uniqueIDs.pop(0), False, epgTools.getChannelName(filePrefix), m3uFile, filePrefix)
             channels.pop(0)
         
         with open(epgFile, 'wb') as afile:
