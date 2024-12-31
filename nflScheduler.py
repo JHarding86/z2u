@@ -3,6 +3,7 @@ import datetime
 import json
 import argparse
 from epgTools import epgTools
+from datetime import datetime, timezone, timedelta
 
 input_file = "temp/downloaded_file.m3u"
 allNFL_m3u = "temp/NFL/nflall.m3u"
@@ -34,8 +35,16 @@ def getNFLYearWeekInfo(seasonURL):
     return yearWeekInfo
 
 def getDate():
-    current_date = datetime.datetime.now()
-    formatted_date = current_date.strftime("%Y%m%d")
+    # Define the MST timezone (UTC-7)
+    mst_timezone = timezone(timedelta(hours=-7))
+
+    # Get the current date and time in UTC
+    utc_now = datetime.now(timezone.utc)
+
+    # Convert UTC time to MST
+    current_date_mst = utc_now.astimezone(mst_timezone)
+    # current_date = datetime.datetime.now()
+    formatted_date = current_date_mst.strftime("%Y%m%d")
     return formatted_date
     
 def getNFLWeeklySchedule():
