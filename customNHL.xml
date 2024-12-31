@@ -38,7 +38,7 @@
     <category lang="en">Sports</category>
   </programme>
   <channel id="bd9c66b3-ad3c-2d6d-1a3d-1fa7bc8960a9">
-    <display-name>NFL002</display-name>
+    <display-name>NHL002</display-name>
     <icon src="https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg"/>
   </channel>
   <programme start="20241231070000 +0000" stop="20250101065959 +0000" channel="bd9c66b3-ad3c-2d6d-1a3d-1fa7bc8960a9">
@@ -47,7 +47,7 @@
     <category lang="en">Sports</category>
   </programme>
   <channel id="972a8469-1641-9f82-8b9d-2434e465e150">
-    <display-name>NFL003</display-name>
+    <display-name>NHL003</display-name>
     <icon src="https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg"/>
   </channel>
   <programme start="20241231070000 +0000" stop="20250101065959 +0000" channel="972a8469-1641-9f82-8b9d-2434e465e150">
@@ -56,7 +56,7 @@
     <category lang="en">Sports</category>
   </programme>
   <channel id="17fc695a-07a0-ca6e-0822-e8f36c031199">
-    <display-name>NFL004</display-name>
+    <display-name>NHL004</display-name>
     <icon src="https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg"/>
   </channel>
   <programme start="20241231070000 +0000" stop="20250101065959 +0000" channel="17fc695a-07a0-ca6e-0822-e8f36c031199">
@@ -65,7 +65,7 @@
     <category lang="en">Sports</category>
   </programme>
   <channel id="9a1de644-815e-f6d1-3b8f-aa1837f8a88b">
-    <display-name>NFL005</display-name>
+    <display-name>NHL005</display-name>
     <icon src="https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg"/>
   </channel>
   <programme start="20241231070000 +0000" stop="20250101065959 +0000" channel="9a1de644-815e-f6d1-3b8f-aa1837f8a88b">
@@ -74,7 +74,7 @@
     <category lang="en">Sports</category>
   </programme>
   <channel id="b74d0fb1-32e7-0629-8fad-c1a606cb0fb3">
-    <display-name>NFL006</display-name>
+    <display-name>NHL006</display-name>
     <icon src="https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg"/>
   </channel>
   <programme start="20241231070000 +0000" stop="20250101065959 +0000" channel="b74d0fb1-32e7-0629-8fad-c1a606cb0fb3">
@@ -83,7 +83,7 @@
     <category lang="en">Sports</category>
   </programme>
   <channel id="6b65a6a4-8b81-48f6-b38a-088ca65ed389">
-    <display-name>NFL007</display-name>
+    <display-name>NHL007</display-name>
     <icon src="https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg"/>
   </channel>
   <programme start="20241231070000 +0000" stop="20250101065959 +0000" channel="6b65a6a4-8b81-48f6-b38a-088ca65ed389">
@@ -92,7 +92,7 @@
     <category lang="en">Sports</category>
   </programme>
   <channel id="47378190-96da-1dac-72ff-5d2a386ecbe0">
-    <display-name>NFL008</display-name>
+    <display-name>NHL008</display-name>
     <icon src="https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg"/>
   </channel>
   <programme start="20241231070000 +0000" stop="20250101065959 +0000" channel="47378190-96da-1dac-72ff-5d2a386ecbe0">
@@ -101,7 +101,7 @@
     <category lang="en">Sports</category>
   </programme>
   <channel id="c241330b-01a9-e71f-de8a-774bcf36d58b">
-    <display-name>NFL009</display-name>
+    <display-name>NHL009</display-name>
     <icon src="https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg"/>
   </channel>
   <programme start="20241231070000 +0000" stop="20250101065959 +0000" channel="c241330b-01a9-e71f-de8a-774bcf36d58b">
@@ -110,7 +110,7 @@
     <category lang="en">Sports</category>
   </programme>
   <channel id="6c307511-b2b9-437a-28df-6ec4ce4a2bbd">
-    <display-name>NFL010</display-name>
+    <display-name>NHL010</display-name>
     <icon src="https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg"/>
   </channel>
   <programme start="20241231070000 +0000" stop="20250101065959 +0000" channel="6c307511-b2b9-437a-28df-6ec4ce4a2bbd">
@@ -119,7 +119,7 @@
     <category lang="en">Sports</category>
   </programme>
   <channel id="371ecd7b-27cd-8130-4722-9389571aa876">
-    <display-name>NFL011</display-name>
+    <display-name>NHL011</display-name>
     <icon src="https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg"/>
   </channel>
   <programme start="20241231070000 +0000" stop="20250101065959 +0000" channel="371ecd7b-27cd-8130-4722-9389571aa876">
@@ -128,7 +128,7 @@
     <category lang="en">Sports</category>
   </programme>
   <channel id="1a2a73ed-562b-0f79-c374-59eef50bea63">
-    <display-name>NFL012</display-name>
+    <display-name>NHL012</display-name>
     <icon src="https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg"/>
   </channel>
   <programme start="20241231070000 +0000" stop="20250101065959 +0000" channel="1a2a73ed-562b-0f79-c374-59eef50bea63">
@@ -137,7 +137,7 @@
     <category lang="en">Sports</category>
   </programme>
   <channel id="5be6128e-18c2-6797-6142-ea7d17be3111">
-    <display-name>NFL013</display-name>
+    <display-name>NHL013</display-name>
     <icon src="https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg"/>
   </channel>
   <programme start="20241231070000 +0000" stop="20250101065959 +0000" channel="5be6128e-18c2-6797-6142-ea7d17be3111">
@@ -146,7 +146,7 @@
     <category lang="en">Sports</category>
   </programme>
   <channel id="43b7a3a6-9a8d-ca03-580d-7b71d8f56413">
-    <display-name>NFL014</display-name>
+    <display-name>NHL014</display-name>
     <icon src="https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg"/>
   </channel>
   <programme start="20241231070000 +0000" stop="20250101065959 +0000" channel="43b7a3a6-9a8d-ca03-580d-7b71d8f56413">
@@ -155,7 +155,7 @@
     <category lang="en">Sports</category>
   </programme>
   <channel id="759cde66-bacf-b3d0-0b1f-9163ce9ff57f">
-    <display-name>NFL015</display-name>
+    <display-name>NHL015</display-name>
     <icon src="https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg"/>
   </channel>
   <programme start="20241231070000 +0000" stop="20250101065959 +0000" channel="759cde66-bacf-b3d0-0b1f-9163ce9ff57f">
