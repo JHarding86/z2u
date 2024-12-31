@@ -12,7 +12,12 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-
+      
+    - name: Set timezone to Asia/Singapore
+      uses: szenius/set-timezone@v2.0
+      with:
+        timezoneLinux: "America/Denver"
+        
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
