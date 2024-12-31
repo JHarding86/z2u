@@ -30,6 +30,7 @@ jobs:
       run: |
         python z2uEPGParser.py $USERNAME $PASSWORD
         python nhlScheduler.py $USERNAME $PASSWORD
+        python nflScheduler.py $USERNAME $PASSWORD
 
     - name: Configure Git
       run: |
@@ -41,7 +42,9 @@ jobs:
         git add filtered_epg_data.xml
         git add customNHL.xml
         git add customNHL.m3u
-        git commit -m 'Updated generic EPG data and Updated NHL EPG/M3U data'
+        git add customNFL.xml
+        git add customNFL.m3u
+        git commit -m 'Updated generic EPG data and Updated NHL and NFL EPG/M3U data'
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
