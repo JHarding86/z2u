@@ -57,7 +57,10 @@ def getNFLWeeklySchedule():
     print("Getting this weeks schedule.")
     schedule = getJSON(f"https://cdn.espn.com/core/nfl/schedule?xhr=1&year={yearWeekInfo['year']}&week={yearWeekInfo['week']}")
 
-    return schedule["content"]["schedule"][f"{getDate()}"]["games"]
+    if getDate() in schedule["content"]["schedule"]:
+        return schedule["content"]["schedule"][f"{getDate()}"]["games"]
+    else:
+        return None
 
 def main():
     print("Generating Custom M3U File...")
@@ -71,20 +74,22 @@ def main():
     epgTools.filterM3UByKeywords(["NFL Game"], ["Network", "REPLAY"], input_file, allNFL_m3u)
 
     games = getNFLWeeklySchedule()
-
+    
     parsedGames = []
-    for game in games:
-        matchup = game['name']
-        teams = matchup.split(" at ")
 
-        aGame = {}
-        aGame["away"] = teams[0]
-        aGame["home"] = teams[1]
-        aGame["date"] = game['competitions'][0]['date']
-        aGame['logo'] = "https://static.www.nfl.com/image/upload/v1554321393/league/nvfr7ogywskqrfaiu38m.svg"
-        parsedGames.append(aGame)
+    if games != None:
+        for game in games:
+            matchup = game['name']
+            teams = matchup.split(" at ")
 
-        print(f"{aGame['away']} at {aGame['home']} @ {aGame['date']}")
+            aGame = {}
+            aGame["away"] = teams[0]
+            aGame["home"] = teams[1]
+            aGame["date"] = game['competitions'][0]['date']
+            aGame['logo'] = "https://static.www.nfl.com/image/upload/v1554321393/league/nvfr7ogywskqrfaiu38m.svg"
+            parsedGames.append(aGame)
+
+            print(f"{aGame['away']} at {aGame['home']} @ {aGame['date']}")
 
     # Generate unique IDs so that we always have the same place to put different channels
     unique_ids = epgTools.generate_unique_ids(20, 12)
