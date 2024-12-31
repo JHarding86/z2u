@@ -295,7 +295,7 @@ class epgTools:
 
         #Make sure there are always at 35 channels made
         while len(channels) > 0:
-            epgTools.outputM3ULine(root, "", "", channels[0]["url"], "https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg", dateString, uniqueIDs.pop(0), False, epgTools.getChannelName("NFL"), m3uFile)
+            epgTools.outputM3ULine(root, "", "", channels[0]["url"], "https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg", dateString, uniqueIDs.pop(0), False, epgTools.getChannelName(filePrefix), m3uFile)
             channels.pop(0)
         
         with open(epgFile, 'wb') as afile:
