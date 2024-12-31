@@ -4,8 +4,13 @@ import requests
 import random
 import uuid
 import os
+import xml.etree.ElementTree as ET
+import datetime
+from datetime import time
 
 class epgTools:
+    sChannelCount = 0
+
     @staticmethod
     def filterEPGByKeywords(input_file, output_file, keyword, needsChannelID):
         try:
@@ -103,6 +108,21 @@ class epgTools:
         print("Processing complete. Check the output file for results.")
     
     @staticmethod
+    def parseM3UIntoObj(file_name):
+        channels = []
+        with open(file_name, 'r', encoding='utf-8') as file:
+            lines = file.readlines()
+            for i in range(0, len(lines), 2):
+                extinf_line = lines[i].strip()
+                url_line = lines[i + 1].strip()
+                if extinf_line.startswith("#EXTINF"):
+                    channel_info = {
+                        "extinf": extinf_line,
+                        "url": url_line
+                    }
+                    channels.append(channel_info)
+        return channels
+    @staticmethod
     def generate_unique_ids(count, seed):
         random.seed(seed)
         ids = []
@@ -113,6 +133,12 @@ class epgTools:
         return ids
     
     @staticmethod
+    def getChannelName(preName: str):
+        channelName = preName + str(epgTools.sChannelCount).zfill(3)
+        epgTools.sChannelCount += 1
+        return channelName
+    
+    @staticmethod
     def createDirectory(dir):
         # Check if the directory already exists
         if not os.path.exists(dir):
@@ -120,3 +146,158 @@ class epgTools:
             print(f"Directory '{dir}' created successfully.")
         else:
             print(f"Directory '{dir}' already exists.")
+
+    @staticmethod
+    def removeFile(fileName: str):
+        if os.path.isfile(fileName):
+            os.remove(fileName)
+
+    @staticmethod
+    def createSingleChannelEPGData(UniqueID, tvgName, logo):
+        #Creating M3U8 Data
+        xmlChannel      = ET.Element('channel')
+        xmlDisplayName  = ET.Element('display-name')
+        xmlIcon         = ET.Element('icon')
+
+        xmlChannel.set('id', UniqueID)
+        xmlDisplayName.text = tvgName
+        xmlIcon.set('src', logo)
+
+        xmlChannel.append(xmlDisplayName)
+        xmlChannel.append(xmlIcon)
+
+        return xmlChannel
+
+    @staticmethod
+    def createSingleEPGData(startTime, stopTime, UniqueID, channelName, description):
+        #Creating EPG Data
+        programme   = ET.Element('programme')
+        title       = ET.Element('title')
+        desc        = ET.Element('desc')
+        category    = ET.Element('category')
+
+        programme.set('start', startTime + " +0000")
+        programme.set('stop', stopTime + " +0000")
+        programme.set('channel', UniqueID)
+
+        title.text = channelName
+
+        desc.text = description
+
+        category.set('lang', "en")
+        category.text = "Sports"
+
+        programme.append(title)
+        programme.append(desc)
+        programme.append(category)
+
+        return programme
+
+    @staticmethod
+    def outputM3ULine(root: ET.Element, teamName, otherTeam, link, logo, dateString, UniqueID, isThereAGame, channelName, m3uFile):
+        tvgName = channelName
+        tvLabel = tvgName
+        with open(m3uFile, 'a', encoding='utf-8') as file:  # Use 'a' mode for appending
+            file.write(f'#EXTINF:-1 tvg-id="{UniqueID}" tvg-name="{tvgName}" tvg-logo="{logo}" group-title="James Custom", {tvLabel}\n')
+            file.write(link + "\n")
+
+        #Creating EPG Data
+        xmlChannel = epgTools.createSingleChannelEPGData(UniqueID, tvgName, logo)
+        root.append(xmlChannel)
+
+        #NHL schedule has times in UTC. Plex does a good job of converting these times for presentation in your time zone.
+        #There is a problem when an entire channel is dedicated to a single show. That is at the begining of the day, you would
+        #like the channel to show the date and time so you know when it comes on. UTC time must be used for this, so some trickery
+        #must be used to come up with the correct start of day time.
+
+        #To account for this, you must adjust the UTC time to your timezone (here it is adjusting for MST -7hrs):
+            #Items Needed:
+                #A start time for the day in UTC. - Midnight of that day in UTC, Used as fake filler data
+                #An end time for the fake filler data
+                #A start time for the actual game
+                #An end time for the actual game.
+                #Start and end time for filler data for the rest of the day
+        try:
+            utc_game_S_programme = datetime.datetime.strptime(dateString, '%Y-%m-%dT%H:%M:%SZ')
+        except:
+            utc_game_S_programme = datetime.datetime.strptime(dateString, '%Y-%m-%dT%H:%MZ')
+
+        utc_game_E_programme = utc_game_S_programme + datetime.timedelta(hours=2.5)
+
+        mst_game_E_programme = utc_game_E_programme - datetime.timedelta(hours=7)
+        game_end_of_day = datetime.datetime.combine(mst_game_E_programme, time.max) + datetime.timedelta(hours=7)
+
+        game_mst = utc_game_S_programme - datetime.timedelta(hours=7)
+        game_mst_day_start = datetime.datetime.combine(game_mst, time.min)
+        start_first_fill = game_mst_day_start + datetime.timedelta(hours=7)
+        end_first_fill = utc_game_S_programme - datetime.timedelta(seconds=1)
+
+        start_second_fill = utc_game_E_programme + datetime.timedelta(seconds=1)
+        end_second_fill = game_end_of_day
+        mst_game_S_display = utc_game_S_programme - datetime.timedelta(hours=7)
+
+        # print(f"Game Time: {utc_game_S_programme} {utc_game_E_programme}")
+        # print(f"First Fill:  {start_first_fill} {end_first_fill}")
+        # print(f"Game Fill:   {utc_game_S_programme} {utc_game_E_programme}")
+        # print(f"Second Fill: {start_second_fill} {end_second_fill}")
+        # print(f"Game Display Time: {mst_game_S_display}")
+
+        channelNamePre  = f"Pre-Game {teamName} vs {otherTeam} - {mst_game_S_display.strftime('%m/%d/%Y %I:%M %p')}"
+        channelName     = f"{teamName} vs {otherTeam} - {mst_game_S_display.strftime('%m/%d/%Y %I:%M %p')}"
+        channelNamePost = f"Post-Game {teamName} vs {otherTeam} - {mst_game_S_display.strftime('%m/%d/%Y %I:%M %p')}"
+
+        if isThereAGame:
+            programme = epgTools.createSingleEPGData(start_first_fill.strftime('%Y%m%d%H%M%S'), end_first_fill.strftime('%Y%m%d%H%M%S'), UniqueID, channelNamePre, "Fill Block for the day.")
+            root.append(programme)
+            programme = epgTools.createSingleEPGData(utc_game_S_programme.strftime('%Y%m%d%H%M%S'), utc_game_E_programme.strftime('%Y%m%d%H%M%S'), UniqueID, channelName, "This is the game!")
+            root.append(programme)
+            programme = epgTools.createSingleEPGData(start_second_fill.strftime('%Y%m%d%H%M%S'), end_second_fill.strftime('%Y%m%d%H%M%S'), UniqueID, channelNamePost, "This game has ended.")
+            root.append(programme)
+        else:
+            programme = epgTools.createSingleEPGData(start_first_fill.strftime('%Y%m%d%H%M%S'), end_second_fill.strftime('%Y%m%d%H%M%S'), UniqueID, "No Game", "There is no game on this channel for this day.")
+            root.append(programme)
+
+    @staticmethod
+    def createEPG(games, uniqueIDs, m3uInputFile, filePrefix):
+
+        m3uFile = "custom" + filePrefix + ".m3u"
+        epgFile = "custom" + filePrefix + ".xml"
+
+        epgTools.removeFile(m3uFile)
+        epgTools.removeFile(epgFile)
+
+        root = ET.Element('tv')
+        # Read the m3u file so we have a basis for the channel that a team is associated with
+        channels = epgTools.parseM3UIntoObj(m3uInputFile)
+
+        dateString = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")#2024-12-28T00:00:00Z
+        for game in games:
+            awayTeamName = game["away"]
+            homeTeamName = game["home"]
+            dateString = game["date"]
+            logo = game["logo"]
+
+            gameName = f"{awayTeamName} at {homeTeamName}"
+
+            print(f"{gameName} @ {dateString}")
+            i = 0
+            while i < len(channels):
+                channel = channels[i]
+                if awayTeamName.lower() in channel["extinf"].lower():
+                    # print(f"We found match for away team {awayTeamName} - {line}")
+                    epgTools.outputM3ULine(root, awayTeamName, homeTeamName, channel["url"], logo, dateString, uniqueIDs.pop(0), True, epgTools.getChannelName(filePrefix), m3uFile)
+                    channels.pop(i)
+                    break
+                # if homeTeamName.lower() in channel["extinf"].lower():
+                #     # print(f"We found match for home team {homeTeamName} - {line}")
+                #     outputM3ULine(homeTeamName, awayTeamName, channel["url"], homeTeamLogo, dateString)
+                i += 1
+
+        #Make sure there are always at 35 channels made
+        while len(channels) > 0:
+            epgTools.outputM3ULine(root, "", "", channels[0]["url"], "https://upload.wikimedia.org/wikipedia/commons/8/8d/No-Symbol.svg", dateString, uniqueIDs.pop(0), False, epgTools.getChannelName("NFL"), m3uFile)
+            channels.pop(0)
+        
+        with open(epgFile, 'wb') as afile:
+            xmlString = etree.fromstring(ET.tostring(root, encoding='utf-8').decode('utf-8'))
+            afile.write(etree.tostring(xmlString, pretty_print=True, encoding='utf-8'))
